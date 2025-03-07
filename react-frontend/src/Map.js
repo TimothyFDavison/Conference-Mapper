@@ -30,18 +30,35 @@ function MyMap() {
 
 
   // Fetch marker data from the backend API
+  const categories = null; // or [] or other values
+  const startDate = null; // or a valid date string like "2023-01-01"
+  const endDate = null; // or a valid date string like "2023-12-31"
+  const pastCfpDeadline = null; // or true/false
+  const params = new URLSearchParams();
+  if (categories !== null) {
+    params.append('categories', categories);
+  }
+  if (startDate !== null) {
+      params.append('start_date', startDate);
+  }
+  if (endDate !== null) {
+      params.append('end_date', endDate);
+  }
+  if (pastCfpDeadline !== null) {
+      params.append('past_cfp_deadline', pastCfpDeadline);
+  }
   useEffect(() => {
-        fetch('http://localhost:5000/api/markers')
-          .then(response => response.json())
-          .then(data => {
+    fetch(`http://localhost:5000/api/markers?${params.toString()}`)
+        .then(response => response.json())
+        .then(data => {
             setMarkers(data);
             setLoading(false);
-          })
-          .catch(err => {
+        })
+        .catch(err => {
             console.error('Error fetching markers:', err);
             setLoading(false);
-          });
-  }, []);
+        });
+}, []);
 
 
     const generatePopupContent = (marker) => {
@@ -101,9 +118,11 @@ function MyMap() {
                 </button>
                 <h2>Conference Mapper</h2>
                 <p>For when you want your work travel to be fun travel.</p>
-                <p>Conference data is scraped nightly from WikiCFP. Conferences not listed on WikiCFP will not be
-                    present here. Accuracy, completeness, and proper data cleaning
-                    is not guaranteed. Conferences with missing or incomplete location data are ignored.</p>
+                <p>Data is scraped nightly from WikiCFP. Conferences not listed on WikiCFP will not be
+                    shown. Accuracy, completeness, and proper data cleaning are not guaranteed. Conferences with
+                    missing or incomplete location data are ignored.</p>
+                <p>In the conference information markers, "CFP Deadline" refers to the call for proposals, i.e.
+                    when you need to submit your abstract in order to present.</p>
             </div>
         </div>
         )}

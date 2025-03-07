@@ -41,4 +41,5 @@ Display a render similar to Google Earth or Google Maps. Allow for search and fi
 - Add buttons on the left pane for:
   - Date filter
   - CFP date filter
-  - Information page
+  - Academic category multiselect
+- Add LLM chat widget
