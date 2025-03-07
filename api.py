@@ -25,7 +25,7 @@ def get_db_connection():
 def get_markers():
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
-    cur.execute("SELECT lat, lon, abbreviation, name, dates, location "
+    cur.execute("SELECT lat, lon, abbreviation, name, dates, location, cfp "
                 "FROM scraped_conferences_cleaned_artificial_intelligence")
     markers = cur.fetchall()
     cur.close()

@@ -69,7 +69,7 @@ def geo_lookup(location_name):
         return result[1], result[2]
 
     # Handle some edge cases
-    if location_name in {"virtual conference", "", "n/a"}:
+    if location_name in {"virtual conference", "", "n/a", "hybrid"}:
         return None
 
     # If not in location cache, retrieve location and add it to the cache

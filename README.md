@@ -35,3 +35,10 @@ Display a render similar to Google Earth or Google Maps. Allow for search and fi
   - The result is a table for each conference category with a set of cleaned values
 - Next, build a frontend with folium as a mapping capability
 - Then put it all in a Docker container and deploy it 
+
+## Todo
+- Set up the automatic database refresh
+- Add buttons on the left pane for:
+  - Date filter
+  - CFP date filter
+  - Information page
