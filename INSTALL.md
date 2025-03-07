@@ -78,3 +78,13 @@ Close connection to database
 cur.close()
 conn.close()
 ```
+
+
+### React app
+```bash
+npx create-react-app my-map-app
+cd my-map-app
+npm install react-leaflet leaflet
+
+```
+

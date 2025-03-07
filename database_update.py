@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from geopy.geocoders import Nominatim
 import psycopg2
 
@@ -83,6 +85,50 @@ def geo_lookup(location_name):
     conn.commit()
     return location.latitude, location.longitude
 
+def store_cleaned_conferences(conferences, category):
+    """
+    Create a table for cleaned data by category, if not exists.
+    Table naming convention, "scraped_conferences_cleaned_<category-name>".
+    """
+    cur2 = conn.cursor()
+    table_name = f'{config.CLEANED_OUTPUT_TABLE}_{category.replace(" ", "_")}'
+    cur2.execute(f"""
+        CREATE TABLE IF NOT EXISTS {table_name} (
+            id SERIAL PRIMARY KEY,
+            abbreviation TEXT,
+            name TEXT,
+            dates TEXT,
+            start_date TIMESTAMP,
+            end_date TIMESTAMP,
+            location TEXT,
+            cfp TEXT, 
+            past_submission_date BOOLEAN,
+            lat DOUBLE PRECISION,
+            lon DOUBLE PRECISION
+            
+        );
+    """)
+    conn.commit()
+
+    # Add to database using insert_many for efficiency
+    insert_query = psycopg2.sql.SQL(f"""
+        INSERT INTO {table_name} 
+        (abbreviation, name, dates, start_date, end_date, location, cfp, 
+        past_submission_date, lat, lon)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """)
+    data_tuples = [
+        (
+            conf["abbreviation"], conf["name"], conf["dates"], conf["start_date"],
+            conf["end_date"], conf["location"], conf["cfp"], conf["past_submission_date"],
+            conf["lat"], conf["long"]
+        )
+        for conf in conferences
+    ]
+    if data_tuples:
+        cur2.executemany(insert_query, data_tuples)
+    conn.commit()
+
 def clean_categories(categories):
     """
     Iterate through each table of raw scraped output. NB: entries come in pairs, i.e. two consecutive lines
@@ -107,7 +153,6 @@ def clean_categories(categories):
         past_submission_date = False  # Use WikiCFP's table break to store cfp deadline
         i = 0
         while i < len(data):
-            print(i, len(data))
             entry = data[i][1].split("||||")
             if len(entry) <= 1:  # WikiCFP table break after which deadlines for cfp are past
                 i += 1
@@ -122,10 +167,21 @@ def clean_categories(categories):
                 i += 2
                 continue
 
+            # Date splitter
+            try:
+                start_str, end_str = entry2[0].split(" - ")
+                start_date = datetime.strptime(start_str, "%b %d, %Y")
+                end_date = datetime.strptime(end_str, "%b %d, %Y")
+            except:
+                start_date = None
+                end_date = None
+
             conference = {
                 "abbreviation": entry[0],
                 "name": entry[1],
-                "date": entry2[0],
+                "dates": entry2[0],
+                "start_date": start_date,
+                "end_date": end_date,
                 "location": entry2[1],
                 "cfp": entry2[2],
                 "past_submission_date": past_submission_date,
@@ -134,6 +190,7 @@ def clean_categories(categories):
             }
             i += 2
             conferences.append(conference)
+        store_cleaned_conferences(conferences, category)
 
 
 if __name__ == "__main__":
@@ -141,7 +198,7 @@ if __name__ == "__main__":
     create_geolocation_cache()
 
     # Retrieve categories
-    categories = [x[1] for x in fetch_categories()][:2]
+    categories = [x[1] for x in fetch_categories()][:1]
     scrape_categories(categories)
 
     # Clean data
