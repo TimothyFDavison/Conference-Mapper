@@ -46,7 +46,7 @@ def run_spider(spider, subpage):
     """
     Wrapper to run the spider in separate processes, to avoid issues with twisted.reactor.
     """
-    """
+
     def f(q):
         try:
             # Set pipeline to output into postgres
@@ -81,4 +81,4 @@ def run_spider(spider, subpage):
     process = crawler.CrawlerProcess(settings)
     process.crawl(spider, subpage=subpage)
     process.start()
-
+    """

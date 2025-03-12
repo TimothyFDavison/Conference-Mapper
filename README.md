@@ -38,6 +38,11 @@ Display a render similar to Google Earth or Google Maps. Allow for search and fi
 
 ## Todo
 - Set up the automatic database refresh
+- Move API address out of Map.js, into config somewhere
+- Break out components from application
+- Add API routes to,
+  - Dynamically retrieve the list of available categories
+  - Retrieve one or several categories based on request parameters
 - Add buttons on the left pane for:
   - Date filter
   - CFP date filter

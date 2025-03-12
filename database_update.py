@@ -2,6 +2,7 @@ from datetime import datetime
 
 from geopy.geocoders import Nominatim
 import psycopg2
+from psycopg2 import sql
 
 import config
 from scraper import run_spider, WikiCFPSpider
@@ -111,7 +112,8 @@ def store_cleaned_conferences(conferences, category):
     conn.commit()
 
     # Add to database using insert_many for efficiency
-    insert_query = psycopg2.sql.SQL(f"""
+    # TODO - psycopg2 not working with sql
+    insert_query = sql.SQL(f"""
         INSERT INTO {table_name} 
         (abbreviation, name, dates, start_date, end_date, location, cfp, 
         past_submission_date, lat, lon)
@@ -144,6 +146,7 @@ def clean_categories(categories):
         4) Store all values in a new table, named "scraped_conferences_cleaned_<category-name>".
     """
     for category in categories:
+        print(f"Cleaning {category}")
         # Retrieve raw data
         cur.execute(f'SELECT * FROM {config.RAW_OUTPUT_TABLE}_{category.replace(" ", "_")};')
         data = cur.fetchall()
@@ -198,8 +201,8 @@ if __name__ == "__main__":
     create_geolocation_cache()
 
     # Retrieve categories
-    categories = [x[1] for x in fetch_categories()][:1]
-    scrape_categories(categories)
+    categories = [x[1] for x in fetch_categories()]
+    # scrape_categories(categories)
 
     # Clean data
     clean_categories(categories)

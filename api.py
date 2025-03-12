@@ -23,41 +23,67 @@ def get_db_connection():
     )
     return conn
 
+
+@app.route('/api/categories', methods=['GET'])
+def get_categories():
+    """
+    Return a list of category names.
+    """
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+
+    cur.execute("""SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'""")
+    try:
+        tables = [
+            x["table_name"].split("cleaned_")[1].replace("_", " ").title()
+                  for x in cur.fetchall() if "cleaned" in x["table_name"]
+        ]
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    return jsonify(tables)
+
+
 class ConferenceQuery(BaseModel):
     categories: Optional[list] = None
     start_date: Optional[date] = None
     end_date: Optional[date] = None
     past_cfp_deadline: Optional[bool] = None
 
-@app.route('/api/markers', methods=['GET'])
+@app.route('/api/markers', methods=['POST'])
 def get_markers():
     """
     Return data based on query parameters.
     """
-    categories = request.args.getlist('categories') or None
-    start_date = request.args.get('start_date', type=str) or None
-    end_date = request.args.get('end_date', type=str) or None
-    past_cfp_deadline = request.args.get('past_cfp_deadline', type=bool) or None
+    data = request.get_json()
+    categories = data.get('categories') or None
+    start_date = data.get('start_date') or None
+    end_date = data.get('end_date') or None
+    past_cfp_deadline = data.get('past_cfp_deadline') or None
 
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
     # Build query based on input parameters
+    queries = []
     if categories:
-        tables = ", ".join([f"{config.CLEANED_OUTPUT_TABLE}_{x.replace(' ', '_')}" for x in categories])
-    else:
-        tables = f"{config.CLEANED_OUTPUT_TABLE}_artificial_intelligence"
-    base_query = f"SELECT * FROM {tables} WHERE 1=1"
-    if start_date:
-        base_query += f" AND start_date >= {start_date}"
-    if end_date:
-        base_query += f" AND end_date <= {end_date}"
-    if past_cfp_deadline:
-        base_query += f" AND past_submission_date == {past_cfp_deadline}"
+        for category in categories:
+            table = f"{config.CLEANED_OUTPUT_TABLE}_{category['value'].lower().replace(' ', '_')}"
+            query = f"SELECT * FROM {table} WHERE 1=1"
+            if start_date:
+                query += f" AND start_date >= {start_date}"
+            if end_date:
+                query += f" AND end_date <= {end_date}"
+            if past_cfp_deadline:
+                query += f" AND past_submission_date == {past_cfp_deadline}"
 
-    # Execute query
-    cur.execute(base_query)
+            queries.append(query)
+    else:
+        return jsonify([])
+
+    full_query = " UNION ALL ".join(queries)
+    cur.execute(full_query)
     markers = cur.fetchall()
+    print(len(markers))
     cur.close()
     conn.close()
     return jsonify(markers)
