@@ -40,11 +40,15 @@ Display a render similar to Google Earth or Google Maps. Allow for search and fi
 - Set up the automatic database refresh
 - Move API address out of Map.js, into config somewhere
 - Break out components from application
-- Add API routes to,
-  - Dynamically retrieve the list of available categories
-  - Retrieve one or several categories based on request parameters
-- Add buttons on the left pane for:
-  - Date filter
-  - CFP date filter
-  - Academic category multiselect
+~~- Add API routes to,~~
+  ~~- Dynamically retrieve the list of available categories~~
+  ~~- Retrieve one or several categories based on request parameters~~
+~~- Add buttons on the left pane for:~~
+  ~~- Date filter~~
+  ~~- CFP date filter~~
+  ~~- Academic category multiselect~~
 - Add LLM chat widget
+~~- Remove or prevent duplicates in database~~
+- Clean up UI buttons
+- Set up timers for operations in the cleaning process: after a first geolocation pass, should 
+be much faster than it is

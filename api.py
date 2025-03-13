@@ -3,7 +3,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from datetime import date
+from datetime import date, datetime
 from pydantic import BaseModel
 from typing import Optional
 
@@ -47,7 +47,7 @@ class ConferenceQuery(BaseModel):
     categories: Optional[list] = None
     start_date: Optional[date] = None
     end_date: Optional[date] = None
-    past_cfp_deadline: Optional[bool] = None
+    open_cfp: Optional[bool] = None
 
 @app.route('/api/markers', methods=['POST'])
 def get_markers():
@@ -58,7 +58,7 @@ def get_markers():
     categories = data.get('categories') or None
     start_date = data.get('start_date') or None
     end_date = data.get('end_date') or None
-    past_cfp_deadline = data.get('past_cfp_deadline') or None
+    open_cfp = data.get('open_cfp') or None
 
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
@@ -70,11 +70,13 @@ def get_markers():
             table = f"{config.CLEANED_OUTPUT_TABLE}_{category['value'].lower().replace(' ', '_')}"
             query = f"SELECT * FROM {table} WHERE 1=1"
             if start_date:
-                query += f" AND start_date >= {start_date}"
+                start_date_obj = datetime.strptime(start_date.rstrip("Z"), '%Y-%m-%dT%H:%M:%S.%f')
+                query += f" AND start_date >= '{start_date_obj}'"
             if end_date:
-                query += f" AND end_date <= {end_date}"
-            if past_cfp_deadline:
-                query += f" AND past_submission_date == {past_cfp_deadline}"
+                end_date_obj = datetime.strptime(end_date.rstrip("Z"), '%Y-%m-%dT%H:%M:%S.%f')
+                query += f" AND end_date <= '{end_date_obj}'"
+            if open_cfp:
+                query += f" AND past_submission_date = false"
 
             queries.append(query)
     else:
@@ -83,7 +85,6 @@ def get_markers():
     full_query = " UNION ALL ".join(queries)
     cur.execute(full_query)
     markers = cur.fetchall()
-    print(len(markers))
     cur.close()
     conn.close()
     return jsonify(markers)

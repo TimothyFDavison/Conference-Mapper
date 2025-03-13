@@ -70,7 +70,7 @@ def geo_lookup(location_name):
         return result[1], result[2]
 
     # Handle some edge cases
-    if location_name in {"virtual conference", "", "n/a", "hybrid"}:
+    if location_name in {"virtual conference", "", "n/a", "hybrid", "online", "publication"}:
         return None
 
     # If not in location cache, retrieve location and add it to the cache
@@ -112,7 +112,6 @@ def store_cleaned_conferences(conferences, category):
     conn.commit()
 
     # Add to database using insert_many for efficiency
-    # TODO - psycopg2 not working with sql
     insert_query = sql.SQL(f"""
         INSERT INTO {table_name} 
         (abbreviation, name, dates, start_date, end_date, location, cfp, 
@@ -146,7 +145,7 @@ def clean_categories(categories):
         4) Store all values in a new table, named "scraped_conferences_cleaned_<category-name>".
     """
     for category in categories:
-        print(f"Cleaning {category}")
+        print(f"Cleaning {category}...")
         # Retrieve raw data
         cur.execute(f'SELECT * FROM {config.RAW_OUTPUT_TABLE}_{category.replace(" ", "_")};')
         data = cur.fetchall()
@@ -161,8 +160,14 @@ def clean_categories(categories):
                 i += 1
                 past_submission_date = True
                 continue
-            entry2 = data[i+1][1].split("||||")
-
+            try:
+                entry2 = data[i+1][1].split("||||")
+            except Exception as e:
+                print("Encountered an error while cleaning {category}.")
+                print(f"Line: {data[i]}")
+                print(f"Values: i={i}, len(data)={len(data)}")
+                print(e)
+                break
             # Geo lookup
             try:
                 lat, long = geo_lookup(entry2[1])
@@ -195,6 +200,29 @@ def clean_categories(categories):
             conferences.append(conference)
         store_cleaned_conferences(conferences, category)
 
+def drop_duplicates(categories, column="name"):
+    """
+    Iterate over all tables in the database. Remove rows with duplicate "name" entries.
+    """
+    cur3 = conn.cursor()
+    for category in categories:
+        print(f"Dropping duplicate entries from {category}...")
+        table = f'{config.RAW_OUTPUT_TABLE}_{category.replace(" ", "_")}'
+        query = f"""
+            WITH cte AS (
+                SELECT 
+                    ctid, 
+                    ROW_NUMBER() OVER (PARTITION BY '{column}' ORDER BY ctid) AS rnk
+                FROM {table}
+            )
+            DELETE FROM {table}
+            WHERE ctid IN (
+                SELECT ctid FROM cte WHERE rnk > 1
+            );
+            """
+        cur3.execute(query)
+    conn.commit()
+
 
 if __name__ == "__main__":
     # Initialize database if necessary
@@ -202,7 +230,10 @@ if __name__ == "__main__":
 
     # Retrieve categories
     categories = [x[1] for x in fetch_categories()]
-    # scrape_categories(categories)
+    scrape_categories(categories)
 
     # Clean data
     clean_categories(categories)
+
+    # Drop duplicates
+    drop_duplicates(categories)

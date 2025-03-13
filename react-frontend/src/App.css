@@ -75,3 +75,21 @@
   font-size: 20px;
   cursor: pointer;
 }
+
+.react-datepicker__input-container input {
+    font-size: 16px !important;
+    padding: 8px;
+}
+
+.full-width-datepicker {
+  width: 100% !important;  /* Force DatePicker to occupy full width */
+  margin: 0;
+}
+
+.react-datepicker__input-container {
+  width: 100%; /* Ensure the input container also takes full width */
+}
+
+.react-datepicker__input-container input {
+  width: 100%; /* Ensures the input inside the DatePicker takes full width */
+}

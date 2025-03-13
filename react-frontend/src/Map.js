@@ -8,8 +8,10 @@ import markerShadowPng from "leaflet/dist/images/marker-shadow.png";
 import 'react-leaflet-markercluster/styles'
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import Select from 'react-select';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
-// Default icons show up as boxes in react-leaflet
+
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconUrl: markerIconPng,
@@ -43,7 +45,6 @@ function MyMap() {
     fetch("http://localhost:5000/api/categories")
       .then(response => response.json())
       .then(data => {
-        // Assuming API returns an array of objects like [{ value: 'chocolate', label: 'Chocolate' }]
         const formattedOptions = data.map(option => ({
           value: option,
           label: option.charAt(0).toUpperCase() + option.slice(1) // Capitalize first letter
@@ -55,41 +56,52 @@ function MyMap() {
   const customStyles = {
     control: (provided) => ({
       ...provided,
-      width: 300, // Fixed width for the select box
-      height: 60, // Fixed height for the select box
+      width: 300,
+      height: 60,
     }),
     menu: (provided) => ({
       ...provided,
-      width: 300, // Same width for the dropdown menu
+      width: 300,
     }),
     multiValue: (provided) => ({
       ...provided,
-      maxWidth: '100%', // Ensure selected values stay within the box width
+      maxWidth: '100%',
       overflow: 'hidden',
     }),
     multiValueLabel: (provided) => ({
       ...provided,
-      maxWidth: '100%', // Ensure label does not overflow
+      maxWidth: '100%',
       overflow: 'hidden',
     }),
     valueContainer: (provided) => ({
       ...provided,
-      height: '100%', // Allow full height for the selected items container
-      overflowY: 'auto', // Enable vertical scrolling
-      maxHeight: 60, // Max height for the selected items container
+      height: '100%',
+      overflowY: 'auto',
+      maxHeight: 60,
+      alignItems: 'flex-start'
     }),
+        placeholder: (provided) => ({
+    ...provided,
+    alignSelf: "center",
+    margin: "0",
+    padding: "0",
+    fontSize: "16px",
+
+  }),
   };
 
-
+const [startDate, setStartDate] = useState(null);
+const [endDate, setEndDate] = useState(null);
 
 
   const [showModal, setShowModal] = useState(false);
   const handleModalToggle = () => {
     setShowModal(!showModal);
   };
-  const startDate = null;
-  const endDate = null;
-  const pastCfpDeadline = null;
+  const [openCfp, setOpenCfp] = useState(false);
+  const handleCheckboxChange = () => {
+    setOpenCfp(!openCfp);
+  };
 
   useEffect(() => {
       setMarkers([]);
@@ -97,7 +109,7 @@ function MyMap() {
         categories: selectedOptions,
         start_date: startDate,
         end_date: endDate,
-        past_cfp_deadline: pastCfpDeadline
+        openCfp: openCfp
       };
     fetch('http://localhost:5000/api/markers', {
         method: 'POST',
@@ -115,7 +127,7 @@ function MyMap() {
             console.error('Error fetching markers:', err);
             setLoading(false);
         });
-}, [selectedOptions, startDate, endDate, pastCfpDeadline]);
+}, [selectedOptions, startDate, endDate, openCfp]);
 
 
     const generatePopupContent = (marker) => {
@@ -137,7 +149,7 @@ function MyMap() {
 
             <div style={{
                 position: "absolute",
-                top: "90px",
+                top: "10px",
                 left: "10px",
                 zIndex: 1000,
                 background: "white",
@@ -151,19 +163,99 @@ function MyMap() {
                     isMulti
                     value={selectedOptions}
                     onChange={setSelectedOptions}
-                    placeholder="Select categories..."
+                    placeholder="Conference category"
                     options={categoryOptions}
                     styles={customStyles}
                 />
             </div>
 
 
+            <div style={{
+                position: "absolute",
+                top: "85px",
+                left: "10px",
+                zIndex: 900,
+                background: "white",
+                padding: "5px",
+                borderRadius: "5px",
+                width: "300px",
+                boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                border: "1px solid #ddd",
+            }}>
+                <div style={{display: "flex", flexDirection: "column", gap: "8px", width: "81%",}}>
+                    <DatePicker
+                        selected={startDate}
+                        onChange={(date) => setStartDate(date)}
+                        selectsStart
+                        startDate={startDate}
+                        endDate={endDate}
+                        placeholderText="Conference start date"
+                        isClearable
+                        popperPlacement="bottom-start"
+                        style={{width: "100%"}}
+                        wrapperClassName="full-width-datepicker"
+                    />
+                    <DatePicker
+                        selected={endDate}
+                        onChange={(date) => setEndDate(date)}
+                        selectsEnd
+                        startDate={startDate}
+                        endDate={endDate}
+                        minDate={startDate}
+                        placeholderText="Conference end date"
+                        isClearable
+                        popperPlacement="bottom-start"
+                        style={{width: "100%"}}
+                    />
+                </div>
+            </div>
+
+
+            <div
+                style={{
+                    position: "absolute",
+                    top: "187px",
+                    left: "10px",
+                    zIndex: 600,
+                    display: "flex",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    backgroundColor: "white",
+                    padding: "5px 10px",
+                    borderRadius: "5px",
+                    boxShadow: "0px 2px 5px rgba(0,0,0,0.1)",
+                    width: '290px'
+                }}
+            >
+        >
+          <label
+            htmlFor="feature-checkbox" // Associate label with checkbox
+            style={{
+              display: "flex",
+              alignItems: "center",
+              cursor: "pointer",
+              fontSize: "14px",
+            }}
+          >
+            <input
+              type="checkbox"
+              id="feature-checkbox"
+              checked={openCfp}
+              onChange={handleCheckboxChange}
+              style={{ marginRight: "8px" }}
+            />
+            <span>Only show open CFPs</span>
+          </label>
+        </div>
+
+
+
             <button
                 onClick={() => setDarkMode(!darkMode)}
                 style={{
                     position: "absolute",
-                    top: "10px",
-                    left: "10px",
+                    bottom: "10px",
+                    left: "85px",
                     zIndex: 1000,
                     padding: "10px 15px",
                     backgroundColor: darkMode ? "#fff" : "#333",
@@ -171,54 +263,57 @@ function MyMap() {
                     border: "none",
                     borderRadius: "5px",
                     cursor: "pointer",
-                }}
-            >
-                {darkMode ? "Light" : "Dark"} Mode
-            </button>
-            <button
-                onClick={handleModalToggle}
-                style={{
-                    position: 'absolute',
-                    top: '50px',
-                    left: '10px',
-                    zIndex: 1000,
-                    padding: '10px 15px',
-                    backgroundColor: '#fff',
-                    color: '#333',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                }}
-            >
-                About
-            </button>
-            {showModal && (
-                <div className="modal" onClick={() => setShowModal(false)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <button className="close-btn" onClick={() => setShowModal(false)}>
-                            X
-                        </button>
-                        <h2>Conference Mapper</h2>
-                        <p>For when you want your work travel to be fun travel.</p>
-                        <p>Data is scraped nightly from WikiCFP. Conferences not listed on WikiCFP will not be
-                            shown. Accuracy, completeness, and proper data cleaning are not guaranteed. Conferences with
-                            missing or incomplete location data are ignored.</p>
-                        <p>In the conference information markers, "CFP Deadline" refers to the call for proposals, i.e.
-                            when you need to submit your abstract in order to present.</p>
-                    </div>
+        }}
+    >
+        {darkMode ? "Light" : "Dark"} Mode
+    </button>
+    <button
+        onClick={handleModalToggle}
+        style={{
+            position: 'absolute',
+            bottom: '10px',
+            left: '10px',
+            zIndex: 1000,
+            padding: '10px 15px',
+            backgroundColor: '#fff',
+            color: '#333',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+        }}
+    >
+        About
+    </button>
+    {
+        showModal && (
+            <div className="modal" onClick={() => setShowModal(false)}>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                    <button className="close-btn" onClick={() => setShowModal(false)}>
+                        X
+                    </button>
+                    <h2>Conference Mapper</h2>
+                    <p>For when you want your work travel to be fun travel.</p>
+                    <p>Data is scraped nightly from WikiCFP. Conferences not listed on WikiCFP will not be
+                        shown. Accuracy, completeness, and proper data cleaning are not guaranteed. Conferences with
+                        missing or incomplete location data are ignored.</p>
+                    <p>In the conference information markers, "CFP Deadline" refers to the call for proposals, i.e.
+                        when you need to submit your abstract in order to present.</p>
                 </div>
-            )}
+            </div>
+        )
+    }
 
-            <MapContainer center={[20, 0]} zoom={2} zoomControl={false} style={{height: '100%', width: '100%'}}>
-                <TileLayer
-                    url={darkMode ? darkTile : lightTile}
-                    attribution='malevolentelk'
-                />
-                <MarkerLayer key={markers.length} markers={markers} generatePopupContent={generatePopupContent} />
-            </MapContainer>
+    <MapContainer center={[20, 0]} zoom={2} zoomControl={false} style={{height: '100%', width: '100%'}}>
+        <TileLayer
+            url={darkMode ? darkTile : lightTile}
+            attribution='malevolentelk'
+        />
+        <MarkerLayer key={markers.length} markers={markers} generatePopupContent={generatePopupContent}/>
+    </MapContainer>
 
-        </div>
-    );
+</div>
+)
+    ;
 }
 
 export default MyMap;

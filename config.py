@@ -14,4 +14,4 @@ CLEANED_OUTPUT_TABLE = "scraped_conferences_cleaned"
 SCRAPER_NAME = "wikicfp_scraper"
 SCRAPER_DOMAIN = "wikicfp.com"
 START_URL = "http://www.wikicfp.com/cfp/call?conference={}"
-PAGE_COUNT_MAXIMUM = 2
+PAGE_COUNT_MAXIMUM = 20
