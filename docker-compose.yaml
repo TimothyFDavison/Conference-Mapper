@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  frontend:
+    build: ./react-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./api-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=database
+    depends_on:
+      - database
+
+  database:
+    build: ./database-backend
+    restart: always
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  pg_data:
