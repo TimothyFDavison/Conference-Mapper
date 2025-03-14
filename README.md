@@ -15,6 +15,7 @@ be much faster than it is
 **Deployment** 
 - Set up the automatic database refresh
 - Finish Docker postgres persistence/initialization
+- Update READMEs for all components
 
 **New Features**
 - Better date control for past conferences
