@@ -1,27 +1,73 @@
 from datetime import datetime
+from time import sleep
 
 from geopy.geocoders import Nominatim
 import psycopg2
 from psycopg2 import sql
+from psycopg2.extras import RealDictCursor
 
 import config
 from scraper import run_spider, WikiCFPSpider
 
-# Establish database connection
-conn = psycopg2.connect(
-    dbname=config.DB_NAME, user=config.DB_USER, password=config.DB_PASSWORD, host=config.DB_HOST, port=config.DB_PORT
-)
-cur = conn.cursor()
 
 # Persist geolocator to avoid reloading
 geolocator = Nominatim(user_agent="geocoding_app")
 
+
+def get_db_connection(retries=30, delay=2):
+    for attempt in range(1, retries + 1):
+        try:
+            conn = psycopg2.connect(
+                dbname=config.DB_NAME,
+                user=config.DB_USER,
+                password=config.DB_PASSWORD,
+                host=config.DB_HOST,
+                port=config.DB_PORT
+            )
+            cur = conn.cursor()
+            return conn, cur
+            break
+        except psycopg2.OperationalError as e:
+            print(f"Attempt {attempt}/{retries}: Postgres not ready, waiting {delay} seconds...")
+            sleep(delay)
+    if not conn:
+        raise Exception("Postgres did not become available after several attempts.")
+    return conn, cur
+
+def initialize_tables():
+    """
+    After two hours of wrestling with postgres' native Docker image and failing to get my init.sql script
+    to deploy when/where I wanted it to, here's the nuclear option.
+    """
+    conn, cur = get_db_connection()
+    cur.execute("""
+                CREATE TABLE IF NOT EXISTS conference_categories (
+                    id SERIAL PRIMARY KEY,
+                    category TEXT UNIQUE NOT NULL
+                );
+    """)
+    values = sql.SQL(', ').join(
+        sql.SQL("({})").format(sql.Literal(category))
+        for category in config.CATEGORIES
+    )
+
+    insert_query = sql.SQL("""
+                INSERT INTO conference_categories (category)
+                VALUES {}
+                ON CONFLICT (category) DO NOTHING;
+            """).format(values)
+    cur.execute(insert_query)
+
+    conn.commit()
+    cur.close()
+    conn.close()
 
 def fetch_categories():
     """
     Retrieve the list of conference categories.
     Entries are returned in tuples of (ID, 'name')
     """
+    conn, cur = get_db_connection()
     cur.execute(f"SELECT * FROM {config.CATEGORIES_TABLE};")
     return cur.fetchall()
 
@@ -42,6 +88,7 @@ def create_geolocation_cache():
     Create geo table if it doesn't already exist.
     Add an index for O(1) lookups based on input location name.
     """
+    conn, cur = get_db_connection()
     cur.execute(f"""
         CREATE TABLE IF NOT EXISTS {config.GEOLOCATION_TABLE} (
             location VARCHAR(255) PRIMARY KEY,
@@ -59,6 +106,7 @@ def geo_lookup(location_name):
     If the location has been seen before, retrieve from the cache.
     Otherwise, query the geolocator for lat/long.
     """
+    conn, cur = get_db_connection()
     location_name = location_name.strip().lower()
 
     # Look up in location cache
@@ -91,9 +139,9 @@ def store_cleaned_conferences(conferences, category):
     Create a table for cleaned data by category, if not exists.
     Table naming convention, "scraped_conferences_cleaned_<category-name>".
     """
-    cur2 = conn.cursor()
+    conn, cur = get_db_connection()
     table_name = f'{config.CLEANED_OUTPUT_TABLE}_{category.replace(" ", "_")}'
-    cur2.execute(f"""
+    cur.execute(f"""
         CREATE TABLE IF NOT EXISTS {table_name} (
             id SERIAL PRIMARY KEY,
             abbreviation TEXT,
@@ -127,7 +175,7 @@ def store_cleaned_conferences(conferences, category):
         for conf in conferences
     ]
     if data_tuples:
-        cur2.executemany(insert_query, data_tuples)
+        cur.executemany(insert_query, data_tuples)
     conn.commit()
 
 def clean_categories(categories):
@@ -144,6 +192,7 @@ def clean_categories(categories):
             - If location is unknown, use geopy's Nominatim package for a free lookup
         4) Store all values in a new table, named "scraped_conferences_cleaned_<category-name>".
     """
+    conn, cur = get_db_connection()
     for category in categories:
         print(f"Cleaning {category}...")
         # Retrieve raw data
@@ -204,7 +253,7 @@ def drop_duplicates(categories, column="name"):
     """
     Iterate over all tables in the database. Remove rows with duplicate "name" entries.
     """
-    cur3 = conn.cursor()
+    conn, cur = get_db_connection()
     for category in categories:
         print(f"Dropping duplicate entries from {category}...")
         table = f'{config.RAW_OUTPUT_TABLE}_{category.replace(" ", "_")}'
@@ -220,12 +269,13 @@ def drop_duplicates(categories, column="name"):
                 SELECT ctid FROM cte WHERE rnk > 1
             );
             """
-        cur3.execute(query)
+        cur.execute(query)
     conn.commit()
 
 
 if __name__ == "__main__":
     # Initialize database if necessary
+    initialize_tables()
     create_geolocation_cache()
 
     # Retrieve categories

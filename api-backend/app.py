@@ -26,45 +26,6 @@ def get_db_connection():
     )
     return conn
 
-
-def initialize_tables(retries=30, delay=2):
-    """
-    After two hours of wrestling with postgres' native Docker image and failing to get my init.sql script
-    to deploy when/where I wanted it to, here's the nuclear option.
-    """
-    for attempt in range(1, retries + 1):
-        try:
-            conn = get_db_connection()
-            cur = conn.cursor(cursor_factory=RealDictCursor)
-            print("Connected to Postgres on attempt", attempt)
-        except psycopg2.OperationalError as e:
-            print(f"Attempt {attempt}/{retries}: Postgres not ready, waiting {delay} seconds...")
-            time.sleep(delay)
-    if not conn:
-        raise Exception("Postgres did not become available after several attempts.")
-
-    cur.execute("""
-                CREATE TABLE IF NOT EXISTS conference_categories (
-                    id SERIAL PRIMARY KEY,
-                    category TEXT UNIQUE NOT NULL
-                );
-    """)
-    values = sql.SQL(', ').join(
-        sql.SQL("({})").format(sql.Literal(category))
-        for category in config.CATEGORIES
-    )
-
-    insert_query = sql.SQL("""
-                INSERT INTO conference_categories (category)
-                VALUES {}
-                ON CONFLICT (category) DO NOTHING;
-            """).format(values)
-    cur.execute(insert_query)
-
-    conn.commit()
-    cur.close()
-    conn.close()
-
 @app.route('/api/categories', methods=['GET'])
 def get_categories():
     """
@@ -132,5 +93,4 @@ def get_markers():
 
 
 if __name__ == '__main__':
-    initialize_tables()
     app.run(host=config.HOST, port=config.PORT, debug=True, )

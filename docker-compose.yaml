@@ -25,5 +25,13 @@ services:
     ports:
       - "5432:5432"
 
+  scraper:
+    build: ./scraper-backend
+    environment:
+      - DB_HOST=database
+    depends_on:
+      - database
+
+
 volumes:
   pg_data:

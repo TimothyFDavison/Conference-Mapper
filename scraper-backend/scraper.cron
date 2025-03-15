@@ -1,0 +1,4 @@
+# Run on startup, and nightly if keeping persistent
+DB_HOST=database
+@reboot cd /app && /usr/local/bin/uv run database_update.py >> /var/log/cron.log 2>&1
+0 0 * * * cd /app && /usr/local/bin/uv run database_update.py >> /var/log/cron.log 2>&1
