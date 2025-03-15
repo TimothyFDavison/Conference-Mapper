@@ -233,6 +233,11 @@ def clean_categories(categories):
                 start_date = None
                 end_date = None
 
+            # Double-check submission date
+            past_submission_date = (past_submission_date or
+                                    start_date is None or
+                                    (start_date and (start_date < datetime.now())))
+
             conference = {
                 "abbreviation": entry[0],
                 "name": entry[1],
