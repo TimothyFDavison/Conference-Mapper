@@ -13,12 +13,12 @@ Fun little app to visualize and search for upcoming conferences.
 be much faster than it is
 
 **Deployment** 
-- Set up the automatic database refresh
-- Finish Docker postgres persistence/initialization
+- ~~Set up the automatic database refresh~~
+- ~~Finish Docker postgres persistence/initialization~~
 - Update READMEs for all components
 
 **New Features**
-- Better date control for past conferences
+- ~~Better date control for past conferences~~
 - Add LLM chat widget
-
-
+  - Host an LLM in vLLM 
+  - Allow DB search, location, date filter as tools

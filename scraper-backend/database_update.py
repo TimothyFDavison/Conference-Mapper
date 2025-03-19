@@ -266,7 +266,7 @@ def drop_duplicates(categories, column="name"):
             WITH cte AS (
                 SELECT 
                     ctid, 
-                    ROW_NUMBER() OVER (PARTITION BY '{column}' ORDER BY ctid) AS rnk
+                    ROW_NUMBER() OVER (PARTITION BY {column} ORDER BY ctid) AS rnk
                 FROM {table}
             )
             DELETE FROM {table}
@@ -275,7 +275,7 @@ def drop_duplicates(categories, column="name"):
             );
             """
         cur.execute(query)
-    conn.commit()
+        conn.commit()
 
 
 if __name__ == "__main__":
