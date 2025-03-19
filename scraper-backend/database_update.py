@@ -62,6 +62,19 @@ def initialize_tables():
     cur.close()
     conn.close()
 
+def truncate_raw_tables(categories):
+    conn, cur = get_db_connection()
+    for category in categories:
+        table_name = f'{config.RAW_OUTPUT_TABLE}_{category.replace(" ", "_")}'
+        query = sql.SQL("TRUNCATE TABLE {} RESTART IDENTITY CASCADE;").format(sql.Identifier(table_name))
+        try:
+            cur.execute(query)
+            print(f"Table {table_name} truncated successfully.")
+        except Exception as e:
+            print(f"Error truncating table {table_name}: {e}")
+            continue
+    conn.commit()
+
 def fetch_categories():
     """
     Retrieve the list of conference categories.
@@ -145,7 +158,7 @@ def store_cleaned_conferences(conferences, category):
         CREATE TABLE IF NOT EXISTS {table_name} (
             id SERIAL PRIMARY KEY,
             abbreviation TEXT,
-            name TEXT,
+            name TEXT UNIQUE NOT NULL,
             dates TEXT,
             start_date TIMESTAMP,
             end_date TIMESTAMP,
@@ -165,6 +178,7 @@ def store_cleaned_conferences(conferences, category):
         (abbreviation, name, dates, start_date, end_date, location, cfp, 
         past_submission_date, lat, lon)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ON CONFLICT (name) DO NOTHING;
     """)
     data_tuples = [
         (
@@ -261,7 +275,7 @@ def drop_duplicates(categories, column="name"):
     conn, cur = get_db_connection()
     for category in categories:
         print(f"Dropping duplicate entries from {category}...")
-        table = f'{config.RAW_OUTPUT_TABLE}_{category.replace(" ", "_")}'
+        table = f'{config.CLEANED_OUTPUT_TABLE}_{category.replace(" ", "_")}'
         query = f"""
             WITH cte AS (
                 SELECT 
@@ -274,8 +288,13 @@ def drop_duplicates(categories, column="name"):
                 SELECT ctid FROM cte WHERE rnk > 1
             );
             """
-        cur.execute(query)
-        conn.commit()
+        try:
+            cur.execute(query)
+            conn.commit()
+        except psycopg2.Error as e:
+            print(f"Error executing query for {table}: {e}")
+            continue
+
 
 
 if __name__ == "__main__":
@@ -285,6 +304,14 @@ if __name__ == "__main__":
 
     # Retrieve categories
     categories = [x[1] for x in fetch_categories()]
+
+    # Drop duplicates - probably unnecessary, but running this preemptively in case
+    # any one of the scraping or cleaning operations is interrupted (so that DB doesn't fill up
+    # with duplicate entries)
+    drop_duplicates(categories)
+    truncate_raw_tables(categories)
+
+    # Scrape new data
     scrape_categories(categories)
 
     # Clean data

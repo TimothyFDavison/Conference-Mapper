@@ -1,6 +1,5 @@
-// react-frontent/App.js
 import React from 'react';
-import MyMap from './Map';
+import MyMap from './pages/Map';
 import './App.css';
 
 function App() {

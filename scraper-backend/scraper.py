@@ -74,6 +74,8 @@ def run_spider(spider, subpage):
     if result is not None:
         raise result
     """
+    # Keeping this commented for debugging when necessary
+    # Runs scraper as a foreground process, but non-repeatable 
     settings = get_project_settings()
     settings.set("ITEM_PIPELINES", {
         'scraper_pipelines.pipelines.PostgreSQLPipeline': 100
