@@ -1,6 +1,6 @@
 # Conference Mapper 
 An entirely unnecessary widget for browsing the locations of academic conferences. Data is sourced from 
-[WikiCFP](http://www.wikicfp.com/cfp/home) and organized according to their category structure. The author makes 
+[WikiCFP](http://www.wikicfp.com/cfp/home) and organized according to WikiCFP's category structure. The author makes 
 no claims as to the validity of the data therein, and the data scraping/cleaning pipeline is provided as-is 
 with no guaranteess of accuracy or correctness.
 
@@ -12,10 +12,11 @@ Each subdirectory runs inside its own Docker image. To deploy the full system at
 ```bash
 docker compose build && docker compose up
 ```
-This will start the GUI at port 3000 on your machine. 
+This will start the GUI at port 3000 on your machine. Alternatively, you can build the components individually. See 
+the subdirectories' respective READMEs.
 
-### TODO
-There are items which I haven't had time to address yet, namely
+### To-Do
+There area few items which I haven't had time to address yet, namely:
 - Set up a better logging architecture, especially for the scraper. Scraping is brittle and debugging can be finicky.
 - Refactor the frontend for better separation of concerns and functional components. Especially the map filters
 and the associated CSS for each component.
