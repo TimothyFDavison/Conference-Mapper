@@ -17,6 +17,7 @@ This will start the GUI at port 3000 on your machine.
 ### TODO
 There are items which I haven't had time to address yet, namely
 - Set up a better logging architecture, especially for the scraper. Scraping is brittle and debugging can be finicky.
-- Refactor the frontend for better separation of concerns and functional components.
+- Refactor the frontend for better separation of concerns and functional components. Especially the map filters
+and the associated CSS for each component.
 - Stop the filters window from closing when you "deselect all" of the selected categories. 
 
