@@ -32,6 +32,5 @@ services:
     depends_on:
       - database
 
-
 volumes:
   pg_data:

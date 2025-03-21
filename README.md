@@ -1,27 +1,22 @@
 # Conference Mapper 
-Fun little app to visualize and search for upcoming conferences.
+An entirely unnecessary widget for browsing the locations of academic conferences. Data is sourced from 
+[WikiCFP](http://www.wikicfp.com/cfp/home) and organized according to their category structure. The author makes 
+no claims as to the validity of the data therein, and the data scraping/cleaning pipeline is provided as-is 
+with no guaranteess of accuracy or correctness.
 
-## Todo
+This repository comprises four parts: a web scraper for WikiCFP, a PostgreSQL database, an API to read from that 
+database, and a React web application for user interaction.
 
-**UI Cleanup**
-- ~~Clean up UI buttons~~
-- ~~Break out components from application~~
-- ~~Move API address out of Map.js, into config somewhere~~
+### Installation
+Each subdirectory runs inside its own Docker image. To deploy the full system at once,
+```bash
+docker compose build && docker compose up
+```
+This will start the GUI at port 3000 on your machine. 
 
-**Bug Fixes**
-- Set up timers for operations in the cleaning process: after a first geolocation pass, should 
-be much faster than it is
-- Fix "open CFP" boolean search
+### TODO
+There are items which I haven't had time to address yet, namely
+- Set up a better logging architecture, especially for the scraper. Debugging can be finicky.
+- Expand the repertoire of data sources, and/or take greater care for comprehensiveness and accuracy of ingesting 
+the WikiCFP data.
 
-**Deployment** 
-- ~~Set up the automatic database refresh~~
-- ~~Finish Docker postgres persistence/initialization~~
-- Update READMEs for all components
-- Remove dummy credentials
-- Set start date to date of search
-
-**New Features**
-- ~~Better date control for past conferences~~
-- Add LLM chat widget
-  - Host an LLM in vLLM 
-  - Allow DB search, location, date filter as tools

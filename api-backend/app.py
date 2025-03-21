@@ -40,6 +40,7 @@ def get_categories():
             x["table_name"].split("cleaned_")[1].replace("_", " ").title()
                   for x in cur.fetchall() if "cleaned" in x["table_name"]
         ]
+        tables.sort()
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     return jsonify(tables)
@@ -84,12 +85,22 @@ def get_markers():
     else:
         return jsonify([])
 
+    # Retrieve the data
     full_query = " UNION ALL ".join(queries)
     cur.execute(full_query)
     markers = cur.fetchall()
+
+    # Remove duplicates, i.e. conferences listed in multiple tables
+    seen = set()
+    unique = []
+    for marker in markers:
+        if marker['name'] not in seen:
+            seen.add(marker['name'])
+            unique.append(marker)
+
     cur.close()
     conn.close()
-    return jsonify(markers)
+    return jsonify(unique)
 
 
 if __name__ == '__main__':

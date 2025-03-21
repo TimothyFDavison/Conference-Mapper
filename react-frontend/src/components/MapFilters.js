@@ -3,7 +3,8 @@ import useOutsideClick from '../hooks/useOutsideClick';
 import Select from 'react-select';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { FiFilter, FiX } from 'react-icons/fi';
+import { FiFilter, FiX, FiHelpCircle } from 'react-icons/fi';
+import Tooltip from './Tooltip';
 
 const MapFilters = ({
   categoryOptions,
@@ -30,7 +31,19 @@ const MapFilters = ({
       {isOpen && (
         <div className="filter-box">
           <div className="filter-section">
-            <label>Conference Category</label>
+            <label>
+              Conference Category
+              <Tooltip content={
+                <>
+                  Conference categories as defined by:<br/>
+                  <a href=" http://www.wikicfp.com/cfp/allcat" target="_blank" rel="noopener noreferrer">
+                    http://www.wikicfp.com/cfp/allcat
+                  </a>
+                </>
+              }>
+                <FiHelpCircle className="tooltip-icon" />
+              </Tooltip>
+            </label>
             <Select
               isMulti
               className="react-select-container"

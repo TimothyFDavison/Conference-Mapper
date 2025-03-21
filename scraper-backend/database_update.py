@@ -215,13 +215,11 @@ def clean_categories(categories):
 
         # Iterate through raw data in pairs of lines
         conferences = []
-        past_submission_date = False  # Use WikiCFP's table break to store cfp deadline
         i = 0
         while i < len(data):
             entry = data[i][1].split("||||")
             if len(entry) <= 1:  # WikiCFP table break after which deadlines for cfp are past
                 i += 1
-                past_submission_date = True
                 continue
             try:
                 entry2 = data[i+1][1].split("||||")
@@ -248,9 +246,16 @@ def clean_categories(categories):
                 end_date = None
 
             # Double-check submission date
-            past_submission_date = (past_submission_date or
-                                    start_date is None or
-                                    (start_date and (start_date < datetime.now())))
+            try:
+                cfp_date = datetime.strptime(entry2[2], "%b %d, %Y")
+            except:
+                cfp_date = None
+            past_submission_date = (
+                    cfp_date is None or
+                    start_date is None or
+                    start_date.date() <= datetime.now().date() or
+                    cfp_date.date() <= datetime.now().date()
+            )
 
             conference = {
                 "abbreviation": entry[0],

@@ -207,3 +207,45 @@
   flex-shrink: 0;
   transform: scale(1.1);
 }
+
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.tooltip-box {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: #ddd;
+  padding: 6px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  white-space: nowrap;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+
+.tooltip-box a {
+  color: #5DADE2;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.tooltip-icon {
+  font-size: 14px;
+  color: #004d00;
+  vertical-align: middle;
+}
+
+.tooltip-container:focus .tooltip-box,
+.tooltip-container:hover .tooltip-box {
+  visibility: visible;
+  opacity: 1;
+}
