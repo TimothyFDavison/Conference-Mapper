@@ -141,7 +141,7 @@ const MyMap = () => {
       <MapContainer center={[20, 0]} zoom={2} zoomControl={false} style={{ height: '100%', width: '100%' }}>
         <TileLayer
           url={darkMode ? darkTile : lightTile}
-          attribution='malevolentelk'
+          attribution='TFD'
           zIndex={1}
         />
         {loading ? (

@@ -2,8 +2,8 @@ import os
 
 # Database parameters
 DB_NAME = "conference_mapper"
-DB_USER = "malevolentelk"
-DB_PASSWORD = "malevolentelk"
+DB_USER = "REDACTED"
+DB_PASSWORD = "REDACTED"
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = "5432"
 
