@@ -82,12 +82,12 @@ const MapFilters = ({
           </div>
           <div className="filter-section checkbox">
             <input
-                type="checkbox"
-                id="open-cfp"
-                checked={openCfp}
-                onChange={onOpenCfpChange}
+              type="checkbox"
+              id="open-cfp"
+              checked={openCfp}
+              onChange={onOpenCfpChange}
             />
-            <label>
+            <label htmlFor="open-cfp">
               Only show open CFPs
               <Tooltip content={
                 <>
@@ -96,8 +96,7 @@ const MapFilters = ({
                 </>
               }>
                 <FiHelpCircle className="tooltip-icon"/>
-              </Tooltip>
-            </label>
+              </Tooltip></label>
           </div>
         </div>
       )}
