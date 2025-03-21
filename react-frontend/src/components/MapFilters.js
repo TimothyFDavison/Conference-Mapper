@@ -82,12 +82,22 @@ const MapFilters = ({
           </div>
           <div className="filter-section checkbox">
             <input
-              type="checkbox"
-              id="open-cfp"
-              checked={openCfp}
-              onChange={onOpenCfpChange}
+                type="checkbox"
+                id="open-cfp"
+                checked={openCfp}
+                onChange={onOpenCfpChange}
             />
-            <label htmlFor="open-cfp">Only show open CFPs</label>
+            <label>
+              Only show open CFPs
+              <Tooltip content={
+                <>
+                  Call for papers (CFP), referring to the deadline <br/>
+                  to submit an abstract and present at the conference.
+                </>
+              }>
+                <FiHelpCircle className="tooltip-icon"/>
+              </Tooltip>
+            </label>
           </div>
         </div>
       )}

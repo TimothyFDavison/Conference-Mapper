@@ -16,7 +16,7 @@ This will start the GUI at port 3000 on your machine.
 
 ### TODO
 There are items which I haven't had time to address yet, namely
-- Set up a better logging architecture, especially for the scraper. Debugging can be finicky.
-- Expand the repertoire of data sources, and/or take greater care for comprehensiveness and accuracy of ingesting 
-the WikiCFP data.
+- Set up a better logging architecture, especially for the scraper. Scraping is brittle and debugging can be finicky.
+- Refactor the frontend for better separation of concerns and functional components.
+- Stop the filters window from closing when you "deselect all" of the selected categories. 
 
