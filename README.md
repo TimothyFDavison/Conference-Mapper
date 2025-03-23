@@ -15,6 +15,24 @@ docker compose build && docker compose up
 This will start the GUI at port 3000 on your machine. Alternatively, you can build the components individually. See 
 the subdirectories' respective READMEs.
 
+### Deployment 
+This app has been deployed on an AWS EC2 instance to https://conference-mapper.com.
+
+The steps for deployment included,
+- Setting up an AWS EC2 instance
+  - Copying the code to that instance
+  - Obtaining a certificate from Let's Encrypt to support HTTPS
+  - Configuring nginx for port routing
+  - Building and running the Docker images
+- Setting up the domain name,
+  - Purchasing domain from a third party
+  - Created a Route 53 hosted zone on AWS
+  - Creating DNS records to associate the domain with the EC2 instance
+
+For posterity, the nginx configuration that I'm using is below:
+```yaml
+```
+
 ### To-Do
 There area few items which I haven't had time to address yet, namely:
 - Set up a better logging architecture, especially for the scraper. Scraping is brittle and debugging can be finicky.
