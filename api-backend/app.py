@@ -12,7 +12,7 @@ from typing import Optional
 import config
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "https://conference-mapper.com"}})
 
 
 def get_db_connection():
