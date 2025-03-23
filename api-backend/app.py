@@ -4,7 +4,6 @@ import time
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import psycopg2
-from psycopg2 import sql
 from psycopg2.extras import RealDictCursor
 from datetime import date, datetime
 from pydantic import BaseModel

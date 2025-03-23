@@ -3,7 +3,6 @@ import { Marker, Popup } from 'react-leaflet';
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import 'react-leaflet-markercluster/styles'
 
-
 const MarkerLayer = React.memo(({ markers, generatePopupContent }) => {
   return (
     <MarkerClusterGroup maxClusterRadius={5}>
