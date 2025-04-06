@@ -103,11 +103,14 @@ const MyMap = () => {
         customStyles={customStyles}
       />
 
-      <div className="control-buttons">
+      <div className="desktop-control-buttons">
         <button
           onClick={() => setShowModal(true)}
           style={{
-            position: 'relative',
+            position: 'absolute',
+            bottom: '10px',
+            left: '10px',
+            zIndex: 1000,
             padding: '10px 20px',
             backgroundColor: '#007bff',
             color: 'white',
@@ -121,7 +124,10 @@ const MyMap = () => {
         <button
           onClick={() => setDarkMode(!darkMode)}
           style={{
-            position: 'relative',
+            position: 'absolute',
+            bottom: '10px',
+            left: '100px',
+            zIndex: 1000,
             padding: '10px 20px',
             backgroundColor: '#007bff',
             color: 'white',
@@ -130,12 +136,12 @@ const MyMap = () => {
             cursor: 'pointer',
           }}
         >
-          {darkMode ? 'Dark Mode' : 'Light Mode'}
+          {darkMode ? 'Light Mode' : 'Dark Mode'}
         </button>
       </div>
 
       {/* About Modal Component */}
-      <AboutModal showModal={showModal} onClose={() => setShowModal(false)} />
+      <AboutModal show={showModal} onClose={() => setShowModal(false)} />
 
       {/* Map Container */}
       <MapContainer center={[20, 0]} zoom={2} zoomControl={false} style={{ height: '100%', width: '100%' }}>
