@@ -27,36 +27,43 @@ const MyMap = () => {
   const customStyles = {
     control: (provided) => ({
       ...provided,
-      width: 300,
-      height: 60,
+      minHeight: '38px',
+      height: 'auto',
+      maxHeight: '60px',
+      padding: '0',
     }),
     menu: (provided) => ({
       ...provided,
-      width: 300,
+      width: '100%',
     }),
     multiValue: (provided) => ({
       ...provided,
       maxWidth: '100%',
       overflow: 'hidden',
+      margin: '1px 4px',
     }),
     multiValueLabel: (provided) => ({
       ...provided,
       maxWidth: '100%',
       overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      padding: '2px 6px',
     }),
     valueContainer: (provided) => ({
       ...provided,
       height: '100%',
       overflowY: 'auto',
-      maxHeight: 60,
-      alignItems: 'flex-start'
+      maxHeight: '60px',
+      alignItems: 'center',
+      padding: '2px 6px',
+      gap: '2px',
     }),
     placeholder: (provided) => ({
       ...provided,
       alignSelf: "center",
       margin: "0",
       padding: "0",
-      fontSize: "16px",
+      fontSize: "14px",
     }),
   };
 

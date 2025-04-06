@@ -194,24 +194,23 @@ def store_cleaned_conferences(conferences, category):
 
 def clean_categories(categories):
     """
-    Iterate through each table of raw scraped output. NB: entries come in pairs, i.e. two consecutive lines
-    comprise one entry in the table (this is a byproduct of how the WikiCFP webpage is structured).
-
-    For each academic conference category,
-        1) Retrieve the raw data from its table
-        2) Iterate through pairs of data lines and store conference entries
-            - Extract conference identifier, name, date, location, and call-for-papers due date
-        3) Supplement data with a geo lookup
-            - If location is already known, use cached value
-            - If location is unknown, use geopy's Nominatim package for a free lookup
-        4) Store all values in a new table, named "scraped_conferences_cleaned_<category-name>".
+    Clean and store conference data, filtering out entries with incomplete information.
+    Only conferences with valid location (with geo coordinates) and complete date information
+    will be stored in the cleaned tables.
     """
     conn, cur = get_db_connection()
     for category in categories:
-        print(f"Cleaning {category}...")
+        print(f"\nProcessing {category}...")
         # Retrieve raw data
-        cur.execute(f'SELECT * FROM {config.RAW_OUTPUT_TABLE}_{category.replace(" ", "_")};')
+        table_name = f'{config.RAW_OUTPUT_TABLE}_{category.replace(" ", "_")}'
+        cur.execute(sql.SQL("SELECT * FROM {};").format(sql.Identifier(table_name)))
         data = cur.fetchall()
+
+        # Statistics tracking
+        total_conferences = 0
+        filtered_no_location = 0
+        filtered_no_dates = 0
+        accepted_conferences = 0
 
         # Iterate through raw data in pairs of lines
         conferences = []
@@ -221,57 +220,81 @@ def clean_categories(categories):
             if len(entry) <= 1:  # WikiCFP table break after which deadlines for cfp are past
                 i += 1
                 continue
+                
             try:
                 entry2 = data[i+1][1].split("||||")
             except Exception as e:
-                print("Encountered an error while cleaning {category}.")
-                print(f"Line: {data[i]}")
-                print(f"Values: i={i}, len(data)={len(data)}")
-                print(e)
+                print(f"Error processing entry at index {i}: {e}")
                 break
-            # Geo lookup
-            try:
-                lat, long = geo_lookup(entry2[1])
-            except Exception as e:  # currently skipping conferences without location data
-                i += 2
-                continue
 
-            # Date splitter
-            try:
-                start_str, end_str = entry2[0].split(" - ")
-                start_date = datetime.strptime(start_str, "%b %d, %Y")
-                end_date = datetime.strptime(end_str, "%b %d, %Y")
-            except:
-                start_date = None
-                end_date = None
+            total_conferences += 1
 
-            # Double-check submission date
-            try:
-                cfp_date = datetime.strptime(entry2[2], "%b %d, %Y")
-            except:
-                cfp_date = None
-            past_submission_date = (
-                    cfp_date is None or
-                    start_date is None or
-                    start_date.date() <= datetime.now().date() or
-                    cfp_date.date() <= datetime.now().date()
-            )
-
-            conference = {
+            # Initialize conference data
+            conference_data = {
                 "abbreviation": entry[0],
                 "name": entry[1],
                 "dates": entry2[0],
-                "start_date": start_date,
-                "end_date": end_date,
                 "location": entry2[1],
                 "cfp": entry2[2],
-                "past_submission_date": past_submission_date,
-                "lat": lat,
-                "long": long
+                "start_date": None,
+                "end_date": None,
+                "past_submission_date": False,
+                "lat": None,
+                "long": None
             }
+
+            # Geo lookup - skip if no valid coordinates
+            try:
+                coordinates = geo_lookup(entry2[1])
+                if not coordinates:
+                    print(f"Skipping conference '{entry[1]}': No valid coordinates for location '{entry2[1]}'")
+                    filtered_no_location += 1
+                    i += 2
+                    continue
+                conference_data["lat"], conference_data["long"] = coordinates
+            except Exception as e:
+                print(f"Skipping conference '{entry[1]}': Geo lookup failed for '{entry2[1]}': {e}")
+                filtered_no_location += 1
+                i += 2
+                continue
+
+            # Date parsing - skip if invalid dates
+            try:
+                start_str, end_str = entry2[0].split(" - ")
+                conference_data["start_date"] = datetime.strptime(start_str, "%b %d, %Y")
+                conference_data["end_date"] = datetime.strptime(end_str, "%b %d, %Y")
+            except Exception as e:
+                print(f"Skipping conference '{entry[1]}': Invalid date format '{entry2[0]}': {e}")
+                filtered_no_dates += 1
+                i += 2
+                continue
+
+            # Check submission date
+            try:
+                cfp_date = datetime.strptime(entry2[2], "%b %d, %Y")
+                conference_data["past_submission_date"] = cfp_date < datetime.now()
+            except Exception as e:
+                # Don't filter based on CFP date parsing errors
+                print(f"Note: CFP date parsing failed for '{entry[1]}': {entry2[2]}: {e}")
+
+            # If we got here, the conference has all required data
+            conferences.append(conference_data)
+            accepted_conferences += 1
             i += 2
-            conferences.append(conference)
-        store_cleaned_conferences(conferences, category)
+
+        # Store the cleaned conferences
+        if conferences:
+            print(f"\nCategory {category} statistics:")
+            print(f"Total conferences processed: {total_conferences}")
+            print(f"Filtered due to missing location: {filtered_no_location}")
+            print(f"Filtered due to invalid dates: {filtered_no_dates}")
+            print(f"Accepted conferences: {accepted_conferences}")
+            print(f"Storing {len(conferences)} cleaned conferences...")
+            store_cleaned_conferences(conferences, category)
+        else:
+            print(f"\nNo valid conferences found for {category}")
+
+    conn.close()
 
 def drop_duplicates(categories, column="name"):
     """

@@ -1,6 +1,10 @@
 import React from 'react';
 import MyMap from './pages/Map';
-import './App.css';
+import './styles/Base.css';
+import './styles/MapFilters.css';
+import './styles/Modal.css';
+import './styles/Tooltip.css';
+import './styles/Responsive.css';
 
 function App() {
   return (

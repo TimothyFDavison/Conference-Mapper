@@ -1,5 +1,4 @@
 import React from 'react';
-import '../styles/AboutModal.css';
 
 const AboutModal = ({ showModal, onClose }) => {
   if (!showModal) return null;
@@ -14,17 +13,17 @@ const AboutModal = ({ showModal, onClose }) => {
         <div className="modal-body">
           <p>
             Data scraped nightly from{" "}
-            <a href="http://www.wikicfp.com/cfp/" className={"link"}
+            <a href="http://www.wikicfp.com/cfp/" className="link"
                target="_blank" rel="noopener noreferrer">WikiCFP</a>.
             Neither accuracy nor completeness guaranteed.
             Conferences with missing or incomplete location data are ignored.
           </p>
           <p>
             Not all{" "}
-            <a href="http://www.wikicfp.com/cfp/allcat" className={"link"}
+            <a href="http://www.wikicfp.com/cfp/allcat" className="link"
                target="_blank" rel="noopener noreferrer">available categories</a>{" "}
             are represented here, but feel free to{" "}
-            <a href="https://timothyfdavison.com/" className={"link"}
+            <a href="https://timothyfdavison.com/" className="link"
                target="_blank" rel="noopener noreferrer">reach out</a>{" "}
             if there are any that you'd like me to add to the scraper.
           </p>

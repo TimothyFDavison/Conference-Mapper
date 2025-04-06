@@ -1,0 +1,90 @@
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .filter-container {
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    width: auto;
+  }
+
+  .filter-box {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 5px;
+    padding: 15px;
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .filter-toggle {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .filter-section {
+    margin-bottom: 12px;
+  }
+
+  .filter-section label {
+    font-size: 13px;
+  }
+
+  .tooltip-box {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .react-datepicker__input-container input {
+    font-size: 13px;
+    padding: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-container {
+    position: fixed;
+    top: auto;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+  }
+
+  .filter-box {
+    margin-top: 0;
+    margin-bottom: 5px;
+    padding: 12px;
+  }
+
+  .modal-content {
+    padding: 15px;
+  }
+
+  .close-btn {
+    top: 5px;
+    right: 5px;
+    font-size: 20px;
+  }
+
+  .modal-heading {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+
+  .modal-body {
+    font-size: 14px;
+  }
+
+  .tooltip-box {
+    position: fixed;
+    bottom: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 80%;
+    white-space: normal;
+    text-align: center;
+  }
+} 
