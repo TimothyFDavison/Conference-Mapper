@@ -103,43 +103,36 @@ const MyMap = () => {
         customStyles={customStyles}
       />
 
-      {/* Theme toggle button */}
-      <button
-        onClick={() => setDarkMode(!darkMode)}
-        style={{
-          position: "absolute",
-          bottom: "10px",
-          left: "85px",
-          zIndex: 1000,
-          padding: "10px 15px",
-          backgroundColor: darkMode ? "#fff" : "#333",
-          color: darkMode ? "#333" : "#fff",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
-      >
-        {darkMode ? "Light" : "Dark"} Mode
-      </button>
-
-      {/* About Modal Toggle Button */}
-      <button
-        onClick={() => setShowModal(true)}
-        style={{
-          position: 'absolute',
-          bottom: '10px',
-          left: '10px',
-          zIndex: 1000,
-          padding: '10px 15px',
-          backgroundColor: '#fff',
-          color: '#333',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer',
-        }}
-      >
-        About
-      </button>
+      <div className="control-buttons">
+        <button
+          onClick={() => setShowModal(true)}
+          style={{
+            position: 'relative',
+            padding: '10px 20px',
+            backgroundColor: '#007bff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+          }}
+        >
+          About
+        </button>
+        <button
+          onClick={() => setDarkMode(!darkMode)}
+          style={{
+            position: 'relative',
+            padding: '10px 20px',
+            backgroundColor: '#007bff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+          }}
+        >
+          {darkMode ? 'Dark Mode' : 'Light Mode'}
+        </button>
+      </div>
 
       {/* About Modal Component */}
       <AboutModal showModal={showModal} onClose={() => setShowModal(false)} />

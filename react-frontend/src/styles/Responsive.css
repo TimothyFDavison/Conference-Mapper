@@ -50,6 +50,7 @@
     bottom: 10px;
     left: 10px;
     right: 10px;
+    z-index: 1000;
   }
 
   .filter-box {
@@ -86,5 +87,25 @@
     max-width: 80%;
     white-space: normal;
     text-align: center;
+  }
+
+  /* Control buttons positioning */
+  .control-buttons {
+    position: fixed;
+    bottom: 120px; /* Increased gap from filter container */
+    left: 10px;
+    right: 10px;
+    display: flex;
+    gap: 10px;
+    z-index: 1001; /* Higher z-index than filter container */
+  }
+
+  .control-buttons button {
+    flex: 1;
+    padding: 8px 15px !important;
+    font-size: 13px !important;
+    white-space: nowrap;
+    min-width: 0 !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
   }
 } 
