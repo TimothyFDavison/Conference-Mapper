@@ -1,0 +1,207 @@
+/* Filter container */
+.filter-container {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  font-family: Arial, sans-serif;
+}
+
+.filter-toggle {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.filter-toggle:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+
+.filter-box {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 300px;
+  margin-top: 8px;
+  font-size: 14px;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.filter-section {
+  margin-bottom: 15px;
+  width: 100%;
+  position: relative;
+}
+
+.filter-section label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Checkbox styles */
+.filter-section.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-section.checkbox input {
+  min-width: 18px;
+  min-height: 18px;
+  margin: 0;
+}
+
+.filter-section.checkbox label {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Select styles */
+.react-select-container {
+  width: 100% !important;
+  position: relative !important;
+}
+
+.react-select__control {
+  border: 1px solid #ddd !important;
+  min-height: 38px !important;
+  box-shadow: none !important;
+  background-color: white !important;
+  width: 100% !important;
+  padding: 0 !important;
+}
+
+.react-select__value-container {
+  padding: 2px 6px !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 2px !important;
+}
+
+.react-select__control:hover {
+  border-color: #b3b3b3 !important;
+}
+
+.react-select__control--is-focused {
+  border-color: #007bff !important;
+  box-shadow: 0 0 0 1px #007bff !important;
+}
+
+.react-select__menu {
+  z-index: 1000 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  width: 100% !important;
+  margin-top: 0 !important;
+}
+
+.react-select__menu-list {
+  padding: 0 !important;
+  max-height: 300px !important;
+}
+
+.react-select__option {
+  padding: 8px 12px !important;
+}
+
+.react-select__option--is-focused {
+  background-color: #f0f0f0 !important;
+}
+
+.react-select__option--is-selected {
+  background-color: #007bff !important;
+}
+
+/* Select All and separator styles */
+.react-select__option[aria-disabled="true"] {
+  color: #ccc !important;
+  cursor: default !important;
+  padding: 4px 12px !important;
+  text-align: center !important;
+  background-color: transparent !important;
+}
+
+.react-select__option--is-focused[aria-disabled="true"] {
+  background-color: transparent !important;
+}
+
+.react-select__option[data-select-all="true"] {
+  font-weight: 500 !important;
+  color: #007bff !important;
+  border-bottom: 1px solid #eee !important;
+}
+
+.react-select__option[data-select-all="true"]:hover {
+  background-color: #f8f9fa !important;
+}
+
+.react-select__multi-value {
+  background-color: #e8f0fe !important;
+  margin: 1px 2px !important;
+  align-items: center !important;
+  height: 24px !important;
+}
+
+.react-select__multi-value__label {
+  color: #333 !important;
+  font-size: 12px !important;
+  padding: 2px 6px !important;
+  line-height: 1.2 !important;
+}
+
+.react-select__multi-value__remove {
+  padding: 0 4px !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.react-select__multi-value__remove:hover {
+  background-color: #d1e2fc !important;
+  color: #333 !important;
+}
+
+/* Date picker styles */
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker__input-container input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.react-datepicker__input-container input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 1px #007bff;
+}
+
+.category-clear-button {
+  color: #666;
+  transition: all 0.2s ease;
+}
+
+.category-clear-button:hover {
+  color: #dc3545;
+} 

@@ -1,10 +1,12 @@
 import React, { useState, useRef } from 'react';
 import useOutsideClick from '../hooks/useOutsideClick';
-import Select from 'react-select';
+import Select, { components } from 'react-select';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FiFilter, FiX, FiHelpCircle } from 'react-icons/fi';
+import { MdClear } from 'react-icons/md';
 import Tooltip from './Tooltip';
+import '../styles/MapFilters.css';
 
 const MapFilters = ({
   categoryOptions,
@@ -22,6 +24,66 @@ const MapFilters = ({
   const containerRef = useRef(null);
 
   useOutsideClick(containerRef, () => setIsOpen(false));
+
+  // Handle select all functionality
+  const handleSelectChange = (selected) => {
+    // Check if the select all option was clicked
+    if (selected?.some(option => option.value === '*')) {
+      // If selecting "all", return all options except the "Select All" option
+      onSelectChange(categoryOptions);
+    } else {
+      // Normal selection
+      onSelectChange(selected || []);
+    }
+  };
+
+  // Create options array with Select All option
+  const allOptions = [
+    {
+      label: 'Select All Categories',
+      value: '*',
+      isSelectAll: true
+    },
+    { label: '──────────────', value: 'separator', isDisabled: true },
+    ...categoryOptions
+  ];
+
+  // Custom components for Select
+  const Option = ({ children, ...props }) => {
+    // Style select all option differently
+    const optionStyle = props.data.isSelectAll ? {
+      fontWeight: 500,
+      color: '#007bff',
+      padding: '8px 12px'
+    } : undefined;
+
+    return (
+      <components.Option {...props}>
+        <div style={optionStyle}>{children}</div>
+      </components.Option>
+    );
+  };
+
+  // Custom clear indicator that preserves the native styling
+  const ClearIndicator = props => {
+    const {
+      children = <components.ClearIndicator {...props} />,
+      innerProps: { ref, ...restInnerProps }
+    } = props;
+    return (
+      <div
+        {...restInnerProps}
+        ref={ref}
+        onMouseDown={e => {
+          e.preventDefault(); // Prevent the menu from closing
+          e.stopPropagation();
+          handleSelectChange([]); // Clear the selection
+        }}
+      >
+        {children}
+      </div>
+    );
+  };
 
   return (
     <div className="filter-container" ref={containerRef}>
@@ -49,10 +111,13 @@ const MapFilters = ({
               className="react-select-container"
               classNamePrefix="react-select"
               value={selectedOptions}
-              onChange={onSelectChange}
+              onChange={handleSelectChange}
               placeholder="Conference category"
-              options={categoryOptions}
+              options={allOptions}
               styles={customStyles}
+              components={{ Option, ClearIndicator }}
+              hideSelectedOptions={false}
+              isClearable={true}
             />
           </div>
           <div className="filter-section">
