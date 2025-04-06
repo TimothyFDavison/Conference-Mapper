@@ -76,7 +76,17 @@ def get_markers():
     if categories:
         for category in categories:
             table = f"{config.CLEANED_OUTPUT_TABLE}_{category['value'].lower().replace(' ', '_')}"
-            query = f"SELECT *, CASE WHEN cfp::timestamp > NOW() THEN false ELSE true END as past_submission_date FROM {table} WHERE 1=1"
+            # Extract the first date from CFP string (before any parentheses)
+            query = f"""
+                SELECT *,
+                CASE 
+                    WHEN cfp IS NULL OR cfp = '' THEN true
+                    WHEN TO_TIMESTAMP(SPLIT_PART(cfp, ' (', 1), 'Mon DD, YYYY') > NOW() THEN false
+                    ELSE true
+                END as past_submission_date
+                FROM {table}
+                WHERE 1=1
+            """
             
             if start_date:
                 start_date_obj = datetime.strptime(start_date.rstrip("Z"), '%Y-%m-%dT%H:%M:%S.%f')
@@ -85,7 +95,7 @@ def get_markers():
                 end_date_obj = datetime.strptime(end_date.rstrip("Z"), '%Y-%m-%dT%H:%M:%S.%f')
                 query += f" AND end_date <= '{end_date_obj}'"
             if open_cfp:
-                query += f" AND cfp::timestamp > NOW()"
+                query += f" AND (cfp IS NOT NULL AND cfp != '' AND TO_TIMESTAMP(SPLIT_PART(cfp, ' (', 1), 'Mon DD, YYYY') > NOW())"
 
             queries.append(query)
     else:
