@@ -117,6 +117,13 @@ const MyMap = () => {
             border: 'none',
             borderRadius: '4px',
             cursor: 'pointer',
+            minWidth: '100px',
+            height: '40px',
+            fontSize: '14px',
+            fontWeight: '500',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           About
@@ -126,7 +133,7 @@ const MyMap = () => {
           style={{
             position: 'absolute',
             bottom: '10px',
-            left: '100px',
+            left: '120px',
             zIndex: 1000,
             padding: '10px 20px',
             backgroundColor: '#007bff',
@@ -134,6 +141,13 @@ const MyMap = () => {
             border: 'none',
             borderRadius: '4px',
             cursor: 'pointer',
+            minWidth: '100px',
+            height: '40px',
+            fontSize: '14px',
+            fontWeight: '500',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           {darkMode ? 'Light Mode' : 'Dark Mode'}
@@ -141,7 +155,7 @@ const MyMap = () => {
       </div>
 
       {/* About Modal Component */}
-      <AboutModal show={showModal} onClose={() => setShowModal(false)} />
+      <AboutModal showModal={showModal} onClose={() => setShowModal(false)} />
 
       {/* Map Container */}
       <MapContainer center={[20, 0]} zoom={2} zoomControl={false} style={{ height: '100%', width: '100%' }}>
