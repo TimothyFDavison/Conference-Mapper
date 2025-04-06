@@ -73,7 +73,7 @@
   .filter-container {
     position: fixed;
     top: auto;
-    bottom: 10px;
+    bottom: 110px;
     left: 10px;
     right: 10px;
     z-index: 1000;
@@ -106,7 +106,7 @@
 
   .desktop-control-buttons {
     position: fixed;
-    bottom: 150px;
+    bottom: 10px;
     left: 10px;
     right: 10px;
     display: flex;
