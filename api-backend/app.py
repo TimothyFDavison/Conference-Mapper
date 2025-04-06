@@ -55,12 +55,17 @@ class ConferenceQuery(BaseModel):
 def get_markers():
     """
     Return data based on query parameters.
+    Filters conferences based on:
+    - Selected categories
+    - Date range
+    - CFP status (open/closed based on current date)
     """
     data = request.get_json()
     categories = data.get('categories') or None
     start_date = data.get('start_date') or None
     end_date = data.get('end_date') or None
     open_cfp = data.get('open_cfp') or None
+    current_date = datetime.now()
 
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
@@ -70,7 +75,8 @@ def get_markers():
     if categories:
         for category in categories:
             table = f"{config.CLEANED_OUTPUT_TABLE}_{category['value'].lower().replace(' ', '_')}"
-            query = f"SELECT * FROM {table} WHERE 1=1"
+            query = f"SELECT *, CASE WHEN cfp::timestamp > NOW() THEN false ELSE true END as past_submission_date FROM {table} WHERE 1=1"
+            
             if start_date:
                 start_date_obj = datetime.strptime(start_date.rstrip("Z"), '%Y-%m-%dT%H:%M:%S.%f')
                 query += f" AND start_date >= '{start_date_obj}'"
@@ -78,7 +84,7 @@ def get_markers():
                 end_date_obj = datetime.strptime(end_date.rstrip("Z"), '%Y-%m-%dT%H:%M:%S.%f')
                 query += f" AND end_date <= '{end_date_obj}'"
             if open_cfp:
-                query += f" AND past_submission_date = false"
+                query += f" AND cfp::timestamp > NOW()"
 
             queries.append(query)
     else:
