@@ -31,10 +31,46 @@ The steps for deployment included,
 
 For posterity, the nginx configuration that I'm using is below:
 ```yaml
+server {
+    listen 80;
+    server_name conference-mapper.com;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name conference-mapper.com;
+
+    ssl_certificate /etc/letsencrypt/live/conference-mapper.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/conference-mapper.com/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Allow WebSocket connections if needed
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+    }
+}
+
 ```
 
 ### To-Do
 There area few items which I haven't had time to address yet, namely:
+- Redo the styling throughout App.css to accommodate mobile/screen sizes. 
 - Set up a better logging architecture, especially for the scraper. Scraping is brittle and debugging can be finicky.
 - Refactor the frontend for better separation of concerns and functional components. Especially the map filters
 and the associated CSS for each component.
