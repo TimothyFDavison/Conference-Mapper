@@ -164,10 +164,8 @@ def store_cleaned_conferences(conferences, category):
             end_date TIMESTAMP,
             location TEXT,
             cfp TEXT, 
-            past_submission_date BOOLEAN,
             lat DOUBLE PRECISION,
             lon DOUBLE PRECISION
-            
         );
     """)
     conn.commit()
@@ -175,15 +173,14 @@ def store_cleaned_conferences(conferences, category):
     # Add to database using insert_many for efficiency
     insert_query = sql.SQL(f"""
         INSERT INTO {table_name} 
-        (abbreviation, name, dates, start_date, end_date, location, cfp, 
-        past_submission_date, lat, lon)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        (abbreviation, name, dates, start_date, end_date, location, cfp, lat, lon)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (name) DO NOTHING;
     """)
     data_tuples = [
         (
             conf["abbreviation"], conf["name"], conf["dates"], conf["start_date"],
-            conf["end_date"], conf["location"], conf["cfp"], conf["past_submission_date"],
+            conf["end_date"], conf["location"], conf["cfp"],
             conf["lat"], conf["long"]
         )
         for conf in conferences
@@ -238,7 +235,6 @@ def clean_categories(categories):
                 "cfp": entry2[2],
                 "start_date": None,
                 "end_date": None,
-                "past_submission_date": False,
                 "lat": None,
                 "long": None
             }
@@ -269,12 +265,10 @@ def clean_categories(categories):
                 i += 2
                 continue
 
-            # Check submission date
+            # Check submission date - just validate the format
             try:
                 cfp_date = datetime.strptime(entry2[2], "%b %d, %Y")
-                conference_data["past_submission_date"] = cfp_date < datetime.now()
             except Exception as e:
-                # Don't filter based on CFP date parsing errors
                 print(f"Note: CFP date parsing failed for '{entry[1]}': {entry2[2]}: {e}")
 
             # If we got here, the conference has all required data
