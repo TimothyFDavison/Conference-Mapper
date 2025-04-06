@@ -54,11 +54,14 @@ const MapFilters = ({
     const optionStyle = props.data.isSelectAll ? {
       fontWeight: 500,
       color: '#007bff',
-      padding: '8px 12px'
+      padding: '10px 12px'
     } : undefined;
 
     return (
-      <components.Option {...props}>
+      <components.Option 
+        {...props} 
+        data-is-select-all={props.data.isSelectAll}
+      >
         <div style={optionStyle}>{children}</div>
       </components.Option>
     );
@@ -87,8 +90,19 @@ const MapFilters = ({
 
   return (
     <div className="filter-container" ref={containerRef}>
-      <button className="filter-toggle" onClick={() => setIsOpen(!isOpen)}>
-        {isOpen ? <FiX /> : <FiFilter />} Filters
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="filter-toggle"
+        style={{
+          backgroundColor: '#007bff',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
+        }}
+      >
+        {isOpen ? 'Hide Filters' : 'Show Filters'}
       </button>
       {isOpen && (
         <div className="filter-box">
