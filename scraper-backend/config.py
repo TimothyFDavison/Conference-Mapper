@@ -39,7 +39,6 @@ CATEGORIES = [
     'multimedia',
     'humanities',
     'bioinformatics',
-    'social sciences',
     'medicine',
     'medical',
     'health informatics',
