@@ -128,6 +128,7 @@ const MapFilters = ({
               onChange={handleSelectChange}
               placeholder="Conference category"
               options={allOptions}
+              defaultValue={categoryOptions}
               styles={customStyles}
               components={{ Option, ClearIndicator }}
               hideSelectedOptions={false}
