@@ -330,7 +330,7 @@ if __name__ == "__main__":
     # Drop duplicates - probably unnecessary, but running this preemptively in case
     # any one of the scraping or cleaning operations is interrupted (so that DB doesn't fill up
     # with duplicate entries)
-    drop_duplicates(categories)
+    # drop_duplicates(categories)
     truncate_raw_tables(categories)
 
     # Scrape new data
