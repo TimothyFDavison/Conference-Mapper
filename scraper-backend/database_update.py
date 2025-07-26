@@ -220,9 +220,14 @@ def clean_categories(categories):
                 
             try:
                 entry2 = data[i+1][1].split("||||")
+                if len(entry2) < 3:
+                    print(f"Skipping malformed entry at index {i}: entry2 = {entry2}")
+                    i += 2
+                    continue
             except Exception as e:
                 print(f"Error processing entry at index {i}: {e}")
-                break
+                i += 2
+                continue
 
             total_conferences += 1
 
