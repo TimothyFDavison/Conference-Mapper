@@ -295,6 +295,18 @@ def clean_categories(categories):
 
     conn.close()
 
+
+def table_exists(conn, table_name):
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT EXISTS (
+            SELECT FROM information_schema.tables
+            WHERE table_name = %s
+        );
+    """, (table_name,))
+    return cur.fetchone()[0]
+
+
 def drop_duplicates(categories, column="name"):
     """
     Iterate over all tables in the database. Remove rows with duplicate "name" entries.
@@ -303,6 +315,9 @@ def drop_duplicates(categories, column="name"):
     for category in categories:
         print(f"Dropping duplicate entries from {category}...")
         table = f'{config.CLEANED_OUTPUT_TABLE}_{category.replace(" ", "_")}'
+        if not table_exists(conn, table):
+            print(f"Skipping duplicates drop — table {table} does not exist.")
+            continue
         query = f"""
             WITH cte AS (
                 SELECT 
