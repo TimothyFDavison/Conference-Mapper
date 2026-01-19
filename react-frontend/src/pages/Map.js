@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import MarkerLayer from '../components/MarkerLayer';
@@ -22,6 +22,21 @@ const MyMap = () => {
   const [showModal, setShowModal] = useState(false);
 
   const { categoryOptions } = useCategories();
+  const hasSetDefaultCategory = useRef(false);
+
+  // Set "Artificial Intelligence" as default category once categories load
+  useEffect(() => {
+    if (categoryOptions.length > 0 && !hasSetDefaultCategory.current) {
+      const aiCategory = categoryOptions.find(
+        option => option.label === 'Artificial Intelligence'
+      );
+      if (aiCategory) {
+        setSelectedOptions([aiCategory]);
+      }
+      hasSetDefaultCategory.current = true;
+    }
+  }, [categoryOptions]);
+
   const { markers, loading, error } = useMarkers(selectedOptions, startDate, endDate, openCfp);
 
   const customStyles = {
