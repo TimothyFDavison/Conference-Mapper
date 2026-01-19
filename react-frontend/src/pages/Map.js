@@ -145,7 +145,7 @@ const MyMap = () => {
       <AboutModal showModal={showModal} onClose={() => setShowModal(false)} />
 
       {/* Map Container */}
-      <MapContainer center={[20, 0]} zoom={2} zoomControl={false} style={{ height: '100%', width: '100%' }}>
+      <MapContainer center={[20, 0]} zoom={2} minZoom={2} zoomControl={false} worldCopyJump={true} style={{ height: '100%', width: '100%' }}>
         <TileLayer
           url={darkMode ? darkTile : lightTile}
           attribution='TFD'
