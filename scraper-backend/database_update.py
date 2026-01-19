@@ -220,9 +220,14 @@ def clean_categories(categories):
                 
             try:
                 entry2 = data[i+1][1].split("||||")
+                if len(entry2) < 3:
+                    print(f"Skipping malformed entry at index {i}: entry2 = {entry2}")
+                    i += 2
+                    continue
             except Exception as e:
                 print(f"Error processing entry at index {i}: {e}")
-                break
+                i += 2
+                continue
 
             total_conferences += 1
 
@@ -330,7 +335,7 @@ if __name__ == "__main__":
     # Drop duplicates - probably unnecessary, but running this preemptively in case
     # any one of the scraping or cleaning operations is interrupted (so that DB doesn't fill up
     # with duplicate entries)
-    drop_duplicates(categories)
+    # drop_duplicates(categories)
     truncate_raw_tables(categories)
 
     # Scrape new data
