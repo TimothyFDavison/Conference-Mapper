@@ -4,11 +4,14 @@ import '../styles/Tooltip.css';
 const Tooltip = ({ content, children }) => {
   const [isVisible, setIsVisible] = useState(false);
 
+  const handleToggle = () => setIsVisible(prev => !prev);
+
   return (
     <span
       className="tooltip-container"
       onMouseEnter={() => setIsVisible(true)}
       onMouseLeave={() => setIsVisible(false)}
+      onClick={handleToggle}
       tabIndex={0}
       aria-describedby="tooltip"
     >

@@ -204,4 +204,39 @@
 
 .category-clear-button:hover {
   color: #dc3545;
+}
+
+/* Map control buttons */
+.map-controls-bottom {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  z-index: 1000;
+  display: flex;
+  gap: 8px;
+}
+
+.map-control-btn {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  min-height: 44px;  /* Touch-friendly */
+}
+
+.map-control-btn--about {
+  background-color: #fff;
+  color: #333;
+}
+
+.map-control-btn--theme-dark {
+  background-color: #333;
+  color: #fff;
+}
+
+.map-control-btn--theme-light {
+  background-color: #fff;
+  color: #333;
 } 

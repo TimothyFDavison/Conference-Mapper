@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import MarkerLayer from '../components/MarkerLayer';
@@ -22,6 +22,21 @@ const MyMap = () => {
   const [showModal, setShowModal] = useState(false);
 
   const { categoryOptions } = useCategories();
+  const hasSetDefaultCategory = useRef(false);
+
+  // Set "Artificial Intelligence" as default category once categories load
+  useEffect(() => {
+    if (categoryOptions.length > 0 && !hasSetDefaultCategory.current) {
+      const aiCategory = categoryOptions.find(
+        option => option.label === 'Artificial Intelligence'
+      );
+      if (aiCategory) {
+        setSelectedOptions([aiCategory]);
+      }
+      hasSetDefaultCategory.current = true;
+    }
+  }, [categoryOptions]);
+
   const { markers, loading, error } = useMarkers(selectedOptions, startDate, endDate, openCfp);
 
   const customStyles = {
@@ -103,54 +118,19 @@ const MyMap = () => {
         customStyles={customStyles}
       />
 
-      <div className="desktop-control-buttons">
+      {/* Map control buttons */}
+      <div className="map-controls-bottom">
         <button
+          className="map-control-btn map-control-btn--about"
           onClick={() => setShowModal(true)}
-          style={{
-            position: 'absolute',
-            bottom: '10px',
-            left: '10px',
-            zIndex: 1000,
-            padding: '10px 20px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            minWidth: '100px',
-            height: '40px',
-            fontSize: '14px',
-            fontWeight: '500',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
         >
           About
         </button>
         <button
+          className={`map-control-btn ${darkMode ? 'map-control-btn--theme-light' : 'map-control-btn--theme-dark'}`}
           onClick={() => setDarkMode(!darkMode)}
-          style={{
-            position: 'absolute',
-            bottom: '10px',
-            left: '120px',
-            zIndex: 1000,
-            padding: '10px 20px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            minWidth: '100px',
-            height: '40px',
-            fontSize: '14px',
-            fontWeight: '500',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
         >
-          {darkMode ? 'Light Mode' : 'Dark Mode'}
+          {darkMode ? "Light" : "Dark"} Mode
         </button>
       </div>
 
@@ -158,7 +138,7 @@ const MyMap = () => {
       <AboutModal showModal={showModal} onClose={() => setShowModal(false)} />
 
       {/* Map Container */}
-      <MapContainer center={[20, 0]} zoom={2} zoomControl={false} style={{ height: '100%', width: '100%' }}>
+      <MapContainer center={[20, 0]} zoom={2} minZoom={2} zoomControl={false} attributionControl={false} worldCopyJump={true} style={{ height: '100%', width: '100%' }}>
         <TileLayer
           url={darkMode ? darkTile : lightTile}
           attribution='TFD'
