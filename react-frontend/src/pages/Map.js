@@ -103,49 +103,27 @@ const MyMap = () => {
         customStyles={customStyles}
       />
 
-      {/* Theme toggle button */}
-      <button
-        onClick={() => setDarkMode(!darkMode)}
-        style={{
-          position: "absolute",
-          bottom: "10px",
-          left: "85px",
-          zIndex: 1000,
-          padding: "10px 15px",
-          backgroundColor: darkMode ? "#fff" : "#333",
-          color: darkMode ? "#333" : "#fff",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
-      >
-        {darkMode ? "Light" : "Dark"} Mode
-      </button>
-
-      {/* About Modal Toggle Button */}
-      <button
-        onClick={() => setShowModal(true)}
-        style={{
-          position: 'absolute',
-          bottom: '10px',
-          left: '10px',
-          zIndex: 1000,
-          padding: '10px 15px',
-          backgroundColor: '#fff',
-          color: '#333',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer',
-        }}
-      >
-        About
-      </button>
+      {/* Map control buttons */}
+      <div className="map-controls-bottom">
+        <button
+          className="map-control-btn map-control-btn--about"
+          onClick={() => setShowModal(true)}
+        >
+          About
+        </button>
+        <button
+          className={`map-control-btn ${darkMode ? 'map-control-btn--theme-light' : 'map-control-btn--theme-dark'}`}
+          onClick={() => setDarkMode(!darkMode)}
+        >
+          {darkMode ? "Light" : "Dark"} Mode
+        </button>
+      </div>
 
       {/* About Modal Component */}
       <AboutModal showModal={showModal} onClose={() => setShowModal(false)} />
 
       {/* Map Container */}
-      <MapContainer center={[20, 0]} zoom={2} minZoom={2} zoomControl={false} worldCopyJump={true} style={{ height: '100%', width: '100%' }}>
+      <MapContainer center={[20, 0]} zoom={2} minZoom={2} zoomControl={false} attributionControl={false} worldCopyJump={true} style={{ height: '100%', width: '100%' }}>
         <TileLayer
           url={darkMode ? darkTile : lightTile}
           attribution='TFD'
